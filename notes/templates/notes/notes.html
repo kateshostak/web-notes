@@ -1,0 +1,9 @@
+{% if ordered_notes_list %}
+    <ul>
+    {% for note in ordered_notes_list %}
+        <li>{{note.note_date}} : {{ note.note_text }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>You don't have any notes yet.</p>
+{% endif %}
