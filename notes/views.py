@@ -38,3 +38,17 @@ def add_note(request, username):
             "error_message": "You didn't type any text.",
         }
         return render(request, 'notes/notes.html', context)
+
+
+def delete_notes(request, username):
+    notes_id = request.POST['note_id']
+    author = get_object_or_404(SimpleUser, user_login=username)
+    note_to_delete = author.get_all_notes().filter(pk=notes_id)
+    note_to_delete.delete()
+
+    return HttpResponseRedirect(
+        reverse(
+            'notes:user_notes',
+            args=(username,)
+        )
+    )

@@ -1,17 +1,34 @@
-{% if ordered_notes_list %}
-    <ul>
-    {% for note in ordered_notes_list %}
-        <li>{{note.note_date}} : {{ note.note_text }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>You don't have any notes yet.</p>
-{% endif %}
+<div>
+    <form action="{% url 'notes:delete_notes' username %}" method="post">
+    {% csrf_token %}
+    {% if ordered_notes_list %}
+        <ul>
+        {% for note in ordered_notes_list %}
+            <li>
+                <input type="checkbox" name="note_id" value="{{ note.id }}" />
+                {{note.note_date}} : {{ note.note_text }}
+            </li>
+        {% endfor %}
+        </ul>
+        {% else %}
+            <p>You don't have any notes yet.</p>
+        {% endif %}
+        <div>
+            {% csrf_token %}
+            <button type="submit">Delete selected notes</button>
+        </div>
+    </form>
+</div>
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'notes:add_note' username%}" method="post">
-{% csrf_token %}
-<input type="text" name="note_text">
-<button type="submit">Add note</button>
-</form>
+<div>
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+</div>
+
+<div>
+    <form action="{% url 'notes:add_note' username %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="note_text">
+        <button type="submit">Add note</button>
+    </form>
+</div>
