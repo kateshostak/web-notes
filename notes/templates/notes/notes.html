@@ -7,3 +7,11 @@
 {% else %}
     <p>You don't have any notes yet.</p>
 {% endif %}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'notes:add_note' username%}" method="post">
+{% csrf_token %}
+<input type="text" name="note_text">
+<button type="submit">Add note</button>
+</form>

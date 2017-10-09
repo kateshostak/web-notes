@@ -1,7 +1,9 @@
 from django.conf.urls import url
 from . import views
 
+app_name = 'notes'
+
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^(?P<username>[a-zA-Z0-9]+)/$', views.show_user_notes, name='show_user_notes'),
+    url(r'^(?P<username>[a-zA-Z0-9]+)/$', views.user_notes, name='user_notes'),
+    url(r'^(?P<username>[a-zA-Z0-9]+)/add/$', views.add_note, name='add_note'),
 ]
