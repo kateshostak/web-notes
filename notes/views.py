@@ -41,10 +41,11 @@ def add_note(request, username):
 
 
 def delete_notes(request, username):
-    notes_id = request.POST['note_id']
+    notes_id = request.POST.getlist('note_id')
     author = get_object_or_404(SimpleUser, user_login=username)
-    note_to_delete = author.get_all_notes().filter(pk=notes_id)
-    note_to_delete.delete()
+    note_to_delete = author.get_all_notes().filter(pk__in=notes_id)
+    for note in note_to_delete:
+        note.delete()
 
     return HttpResponseRedirect(
         reverse(
