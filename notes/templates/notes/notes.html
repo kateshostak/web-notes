@@ -6,7 +6,7 @@
         {% for note in ordered_notes_list %}
             <li>
                 <input type="checkbox" name="note_id" value="{{ note.id }}" />
-                {{note.note_date}} : {{ note.note_text }}
+                {{note.date}} : {{ note.text }} : {{note.tag}}
             </li>
         {% endfor %}
         </ul>
@@ -28,7 +28,23 @@
 <div>
     <form action="{% url 'notes:add_note' username %}" method="post">
         {% csrf_token %}
+        Text <br>
         <input type="text" name="note_text">
+        <br>
+        Tag <br>
+        <input type="text" name="note_tag">
         <button type="submit">Add note</button>
+    </form>
+</div>
+
+<div>
+    <form action="{% url 'notes:search' username %}" method="post">
+        {% csrf_token %}
+        Tag <br>
+        <input type="text" name="note_tag">
+        <br>
+        Keyword <br>
+        <input type="text" name="keyword">
+        <button type="submit">Search</button>
     </form>
 </div>
