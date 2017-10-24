@@ -1,15 +1,36 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'notes/style.css' %}" />
+
 <div>
     <form action="{% url 'notes:delete_notes' username %}" method="post">
     {% csrf_token %}
     {% if ordered_notes_list %}
-        <ul>
+    <div class="note_container">
+        <ul >
         {% for note in ordered_notes_list %}
-            <li>
-                <input type="checkbox" name="note_id" value="{{ note.id }}" />
-                {{note.date}} : {{ note.text }} : {{note.tag}}
+
+            <li class="{{ note.status }}">
+                <div class="note_selector">
+                    <input type="checkbox" name="note_id" value="{{ note.id }}" />
+                </div>
+                <div class="note_date">
+                    {{note.date}}
+                </div>
+
+                <div class="note_text">
+                    {{ note.text }}
+                </div>
+
+                <div class="note_tag">
+                    {{note.tag}}
+                </div>
             </li>
+
         {% endfor %}
         </ul>
+    </div>
+
         {% else %}
             <p>You don't have any notes yet.</p>
         {% endif %}
@@ -28,23 +49,19 @@
 <div>
     <form action="{% url 'notes:add_note' username %}" method="post">
         {% csrf_token %}
-        Text <br>
-        <input type="text" name="note_text">
-        <br>
-        Tag <br>
-        <input type="text" name="note_tag">
+
+        {{ note_form }}
+
         <button type="submit">Add note</button>
     </form>
 </div>
 
 <div>
-    <form action="{% url 'notes:search' username %}" method="post">
+    <form action="{% url 'notes:search' username %}" method="get">
         {% csrf_token %}
-        Tag <br>
-        <input type="text" name="note_tag">
-        <br>
-        Keyword <br>
-        <input type="text" name="keyword">
+
+        {{ search_form }}
+
         <button type="submit">Search</button>
     </form>
 </div>
