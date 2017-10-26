@@ -2,22 +2,20 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.urls import reverse
+from django.db.models import Q
 
 from .models import SimpleUser, Note
-from .forms import NoteForm, SearchForm
+from .forms import NoteForm, SearchForm, get_tags, get_years
 
 
 def user_notes(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    note_years = [date.year for date in author.note_set.dates('date', 'year')]
-    note_tags = set([note.tag.lower() for note in author.note_set.all()])
-
-    note_tags_choices = list()
-    for tag in note_tags:
-        note_tags_choices.append((tag, tag))
+    note_tags_choices = get_tags(author)
+    note_years = get_years(author)
 
     note_form = NoteForm(tags=note_tags_choices)
-    search_form = SearchForm(years=note_years)
+    search_form = SearchForm(years=note_years, tags=note_tags_choices)
+
     context = {
         "username": username,
         "note_form": note_form,
@@ -29,19 +27,14 @@ def user_notes(request, username):
 
 def add_note(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    note_years = [date.year for date in author.note_set.dates('date', 'year')]
-    note_tags = set([note.tag.lower() for note in author.note_set.all()])
-
-    note_tags_choices = list()
-    for tag in note_tags:
-        note_tags_choices.append((tag, tag))
+    note_tags_choices = get_tags(author)
 
     note_form = NoteForm(request.POST, tags=note_tags_choices)
 
     if note_form.is_valid():
         new_note = Note(
             text=note_form.cleaned_data['text'],
-            tag=note_form.cleaned_data['tag'],
+            tag=note_form.cleaned_data['tag'].lower(),
             status=note_form.cleaned_data['status'],
             date=timezone.now(),
             author=author,
@@ -73,15 +66,26 @@ def delete_notes(request, username):
 
 def search(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    search_form = SearchForm(request.GET)
-    if search_form.cleaned_data['keyword']:
-        found_notes = author.get_by_keyword(search_form.cleaned_data['keyword'])
-    elif search_form.cleaned_data['tag']:
-        found_notes = author.get_by_tag(search_form.cleaned_data['tag'])
-    elif search_form.cleaned_data['status']:
-        found_notes = author.get_by_status(search_form.cleaned_data['status'])
-    else:
-        found_notes = author.get_all_notes()
+    note_years = get_years(author)
+    note_tags_choices = get_tags(author)
+
+    search_form = SearchForm(
+        request.GET,
+        years=note_years,
+        tags=note_tags_choices
+    )
+
+    found_notes = author.get_all_notes()
+    keyword = search_form['keyword'].value()
+    tag = search_form['tag'].value()
+    status = search_form['status'].value()
+
+    if keyword:
+        found_notes = found_notes.filter(text__contains=keyword)
+    elif tag:
+        found_notes = found_notes.filter(tag=tag)
+    elif status:
+        found_notes = found_notes.filter(status=status)
 
     context = {
         "username": username,
