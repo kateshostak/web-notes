@@ -21,10 +21,10 @@ class SimpleUser(models.Model):
 
 
 class Note(models.Model):
-    NONE = "black"
-    LOW = "green"
-    NORMAL = "orange"
-    URGENT = "red"
+    NONE = ''
+    LOW = "low"
+    NORMAL = "normal"
+    URGENT = "urgent"
 
     STATUS_CHOICES = (
         (NONE, "None"),
