@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 
 
 class SimpleUser(models.Model):
@@ -10,14 +11,21 @@ class SimpleUser(models.Model):
     def get_all_notes(self):
         return self.note_set.all()
 
-    def get_by_tag(self, tag):
-        return self.get_all_notes().filter(tag=tag)
+    def get_tags(self):
+        note_tags = set([note.tag.lower() for note in self.note_set.all()])
+        return [(tag, tag) for tag in note_tags]
 
-    def get_by_keyword(self, keyword):
-        return self.note_set.filter(text__contains=keyword)
+    def get_years(self):
+        return [date.year for date in self.note_set.dates('date', 'year')]
 
-    def get_by_status(self, status):
-        return self.note_set.filter(status=status)
+    def get_status(self):
+        return self.note_set.model.STATUS_CHOICES
+
+    def get_notes_by_ids(self, id_list):
+        return self.note_set.filter(pk__in=id_list)
+
+    def get_notes_by_params(self, keyword, tag, status):
+        return self.note_set.all().filter(Q(text__contains=keyword) & Q(tag=tag) & Q(status__contains=status))
 
 
 class Note(models.Model):

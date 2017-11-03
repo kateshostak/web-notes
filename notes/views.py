@@ -2,20 +2,20 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.urls import reverse
-from django.db.models import Q
 
 from .models import SimpleUser, Note
-from .forms import NoteForm, SearchForm, get_tags, get_years, get_status
+from .forms import NoteForm, SearchForm
 
 
-def user_notes(request, username):
+def show_user_notes(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    note_tags_choices = get_tags(author)
-    note_years = get_years(author)
-    status_choices = get_status(author)
+    note_tags_choices = author.get_tags()
+    note_years = author.get_years()
+    status_choices = author.get_status()
+
+    search_form = SearchForm(years=note_years, tags=note_tags_choices, status=status_choices)
 
     note_form = NoteForm(tags=note_tags_choices)
-    search_form = SearchForm(years=note_years, tags=note_tags_choices, status=status_choices)
 
     context = {
         "username": username,
@@ -28,7 +28,7 @@ def user_notes(request, username):
 
 def add_note(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    note_tags_choices = get_tags(author)
+    note_tags_choices = author.get_tags()
     note_form = NoteForm(request.POST, tags=note_tags_choices)
 
     if note_form.is_valid():
@@ -41,10 +41,7 @@ def add_note(request, username):
 
         )
         new_note.save()
-    else:
-        print("Hi!")
-        for error in note_form.errors:
-            print(str(error))
+
     return HttpResponseRedirect(
         reverse(
             'notes:user_notes',
@@ -54,15 +51,15 @@ def add_note(request, username):
 
 
 def delete_notes(request, username):
-    notes_id = request.POST.getlist('note_id')
+    id_list = request.POST.getlist('note_id')
     author = get_object_or_404(SimpleUser, login=username)
-    note_to_delete = author.get_all_notes().filter(pk__in=notes_id)
+    note_to_delete = author.get_notes_by_ids(id_list)
     for note in note_to_delete:
         note.delete()
 
     return HttpResponseRedirect(
         reverse(
-            'notes:user_notes',
+            'notes:show_user_notes',
             args=(username,)
         )
     )
@@ -70,9 +67,9 @@ def delete_notes(request, username):
 
 def search(request, username):
     author = get_object_or_404(SimpleUser, login=username)
-    note_years = get_years(author)
-    note_tags_choices = get_tags(author)
-    status_choices = get_status(author)
+    note_years = author.get_years()
+    note_tags_choices = author.get_tags()
+    status_choices = author.get_status()
 
     search_form = SearchForm(
         request.GET,
@@ -86,7 +83,7 @@ def search(request, username):
     status = search_form['status'].value()
 
     notes = author.get_all_notes()
-    found_notes = notes.filter(Q(text__contains=keyword) & Q(tag=tag) & Q(status__contains=status))
+    found_notes = author.get_notes_by_params(keyword=keyword, tag=tag, status=status)
 
     context = {
         "username": username,

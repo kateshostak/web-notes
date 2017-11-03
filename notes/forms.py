@@ -1,20 +1,6 @@
 from django import forms
 from .fields import DataListWidget
-from .models import Note, SimpleUser
-from django.core import validators
-
-
-def get_tags(author):
-    note_tags = set([note.tag.lower() for note in author.note_set.all()])
-    return [(tag, tag) for tag in note_tags]
-
-
-def get_years(author):
-    return [date.year for date in author.note_set.dates('date', 'year')]
-
-
-def get_status(author):
-    return author.note_set.model.STATUS_CHOICES
+from .models import Note
 
 
 class NoteForm(forms.ModelForm):
