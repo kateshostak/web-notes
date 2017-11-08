@@ -44,7 +44,7 @@ def add_note(request, username):
 
     return HttpResponseRedirect(
         reverse(
-            'notes:user_notes',
+            'notes:show_user_notes',
             args=(username,)
         )
     )

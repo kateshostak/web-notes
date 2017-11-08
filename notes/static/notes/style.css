@@ -12,6 +12,10 @@ ul {
 	padding-left: 10px;
 }
 
+.low, .normal, .urgent {
+	display: table-row;
+}
+
 .low {
 	background: rgba(76, 175, 80, 0.3)
 }
