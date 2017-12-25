@@ -2,58 +2,83 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'notes/style.css' %}" />
 
+
 <div>
-    <form action="{% url 'notes:delete_notes' username %}" method="post">
-    {% csrf_token %}
-    {% if ordered_notes_list %}
+    <form action="{% url 'notes:add_note_list' username %}" method="post">
+        {% csrf_token %}
+
+        {{ note_list_form }}
+
+        <button type="submit">Create list</button>
+    </form>
+</div>
+
+<div>
+    {% if notes_by_list %}
     <div class="note_container">
         <ul >
-        {% for note in ordered_notes_list %}
+        {% for list_name, notes in notes_by_list.items %}
+            <h3>{{ list_name }}</h3>
 
-            <li class="{{ note.status }}">
-                <div class="note_selector">
-                    <input type="checkbox" name="note_id" value="{{ note.id }}" />
+            <form action="{% url 'notes:delete_note_list' username %}" method="post">
+                {% csrf_token %}
+                <div>
+                    <input type="checkbox" name="list_name", value="{{ list_name }}">
                 </div>
-                <div class="note_date">
-                    {{note.date}}
-                </div>
+                <button type="submit">Delete selected lists</button>
+            </form>
 
-                <div class="note_text">
-                    {{ note.text }}
-                </div>
+                {% if notes %}
+                    <p> {{ notes|length}}</p>
+                    <div>
+                        <form action="{% url 'notes:delete_notes' username %}" method="post">
+                            {% csrf_token %}
 
-                <div class="note_tag">
-                    {{note.tag}}
-                </div>
-            </li>
+                            {% for note in notes %}
+                                <li class="{{ note.status }}">
+                                    <div class="note_selector">
+                                        <input type="checkbox" name="note_id" value="{{ note.id }}" />
+                                    </div>
+                                    <div class="note_date">
+                                        {{note.date}}
+                                    </div>
 
+                                    <div class="note_text">
+                                        {{ note.text }}
+                                    </div>
+
+                                    <div class="note_tag">
+                                        {{note.tag}}
+                                    </div>
+                                </li>
+
+                            {% endfor %}
+                            <button type="submit">Delete selected notes</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p>You don't have any notes yet.</p>
+                {% endif %}
+                <div>
+                    <form action="{% url 'notes:add_note' username %}" method="post">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="note_list_name" value="{{ list_name }}">
+                        {{ note_form }}
+
+                        <button type="submit">Add note</button>
+                    </form>
+                </div>
         {% endfor %}
         </ul>
     </div>
-
-        {% else %}
-            <p>You don't have any notes yet.</p>
-        {% endif %}
-        <div>
-            {% csrf_token %}
-            <button type="submit">Delete selected notes</button>
-        </div>
-    </form>
+    {% else %}
+        <p>You don't have any notes yet.</p>
+    {% endif %}
 </div>
-
 
 <div>
     {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-</div>
-
-<div>
-    <form action="{% url 'notes:add_note' username %}" method="post">
-        {% csrf_token %}
-
-        {{ note_form }}
-
-        <button type="submit">Add note</button>
-    </form>
 </div>
 
 <div>

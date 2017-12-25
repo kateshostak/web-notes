@@ -1,6 +1,12 @@
 from django import forms
 from .fields import DataListWidget
-from .models import Note
+from .models import Note, ListOfNotes
+
+
+class ListOfNotesForm(forms.ModelForm):
+    class Meta:
+        model = ListOfNotes
+        fields = ['name']
 
 
 class NoteForm(forms.ModelForm):

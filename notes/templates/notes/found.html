@@ -1,0 +1,34 @@
+{% if ordered_notes_list %}
+	<div>
+
+				<div>
+                        <form action="{% url 'notes:delete_notes' username %}" method="post">
+                            {% csrf_token %}
+
+                            {% for note in ordered_notes_list %}
+                                <li class="{{ note.status }}">
+                                    <div class="note_selector">
+                                        <input type="checkbox" name="note_id" value="{{ note.id }}" />
+                                    </div>
+                                    <div class="note_date">
+                                        {{note.date}}
+                                    </div>
+
+                                    <div class="note_text">
+                                        {{ note.text }}
+                                    </div>
+
+                                    <div class="note_tag">
+                                        {{note.tag}}
+                                    </div>
+                                </li>
+
+                            {% endfor %}
+                            <button type="submit">Delete selected notes</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p>You don't have any notes yet.</p>
+                {% endif %}
+
+	</div>
