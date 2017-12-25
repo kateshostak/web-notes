@@ -45,13 +45,13 @@ class ListOfNotes(models.Model):
 
 
 class Note(models.Model):
-    NONE = ''
+    NONE = ""
     LOW = "low"
     NORMAL = "normal"
     URGENT = "urgent"
 
     STATUS_CHOICES = (
-        (NONE, "None"),
+        (NONE, ""),
         (LOW, "Low"),
         (NORMAL, "Normal"),
         (URGENT, "Urgent"),
@@ -62,7 +62,7 @@ class Note(models.Model):
     text = models.CharField(max_length=200)
     date = models.DateTimeField('date created', editable=False)
     tag = models.CharField(max_length=50, default="other")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NONE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NONE, blank=True)
 
     def __str__(self):
         return self.text
