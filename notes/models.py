@@ -61,8 +61,8 @@ class Note(models.Model):
     note_list = models.ForeignKey(ListOfNotes, on_delete=models.CASCADE, editable=False, default=None)
     text = models.CharField(max_length=200)
     date = models.DateTimeField('date created', editable=False)
-    tag = models.CharField(max_length=50, default="other")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NONE, blank=True)
+    tag = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, blank=True)
 
     def __str__(self):
         return self.text
